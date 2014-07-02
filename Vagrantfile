@@ -83,9 +83,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         }
 
     chef.run_list = [
-        "recipe[rvm::vagrant]",
-        "recipe[rvm::system]",
-        "recipe[ops::default]"
+      "recipe[rvm::system]",
+      "recipe[ops::default]"
     ]
   end
 end
