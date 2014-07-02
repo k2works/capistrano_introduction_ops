@@ -1,10 +1,6 @@
 default['rvm']['default_ruby'] = "ruby-2.1.0"
 default['rvm']['app_version'] = "#{default['rvm']['default_ruby']}"
 default['rvm']['app_gemset'] = "capistrano_introduction"
-#default['rvm']['user_installs'] = [
-#  { 'user'          => 'deploy'
-#  }
-#]
 
 default['nodejs']['version'] = "v0.10.26"
 default['nodejs']['dirname'] = "node-#{default['nodejs']['version']}"
