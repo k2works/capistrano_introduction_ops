@@ -75,6 +75,19 @@ directory "#{node['app']['deploy_to']}/shared" do
   group 'deploy'
 end
 
+directory "#{node['app']['deploy_to']}/shared/config" do
+  owner 'deploy'
+  group 'deploy'
+end
+
+template 'database.yml' do
+  path "#{node['app']['deploy_to']}/shared/config/database.yml"
+  source "database.yml.erb"
+  owner 'deploy'
+  group 'deploy'
+  mode '0644'
+end
+
 # Rails関連ライブラリ
 %w{git libssl-dev libsqlite3-dev libmysqlclient-dev}.each do |pkg|
   package pkg do
@@ -102,5 +115,12 @@ bash "SetupRvm" do
   usermod -a -G rvm deploy
   umask 002
   source /etc/profile.d/rvm.sh
+  EOH
+end
+# bundlerバグ対応
+bash "SetupForRailsDeploy" do
+  code <<-EOH
+  gem install bundler -v '= 1.5.1'
+  /usr/local/rvm/bin/rvm ruby-2.1.0@global do gem install bundler -v '= 1.5.1'
   EOH
 end
