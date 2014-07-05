@@ -18,45 +18,41 @@ http {
   sendfile  on;
   keepalive_timeout 65;
 
-  <% if node['nginx']['env'].include?("ruby") %>
   upstream unicorn {
-    server unix:/tmp/unicorn.sock;
+    server unix:/<%= node['app']['deploy_to'] %>/shared/tmp/sockets/unicorn.sock;
   }
-  <% end %>
 
   server {
-    listen  80 default_server;
-    server_name _;
+    listen  80;
+    server_name 192.168.33.10;
 
     location / {
-      root /usr/share/nginx/html;
-      index index.html index.htm index.php;
+      proxy_pass http://192.168.33.10;
+    }
+  }
+
+  server {
+    listen 80;
+    server_name 192.168.33.10;
+
+    root /<%= node['app']['deploy_to'] %>/public;
+
+    proxy_connect_timeout 60;
+    proxy_read_timeout    60;
+    proxy_send_timeout    60;
+
+    location / {
+      index index.html;
+
+      try_files $uri @app; # $urlがなければ@appへ
     }
 
-    error_page 404  /404.html;
-    location = /404.html {
-      root /usr/share/nginx/html;
-    }
+    location @app {
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
 
-    # redirect server error pages to the static page /50x.html
-    #
-    error_page 500 502 503 504  /50x.html;
-    location = /50x.html {
-      root /usr/share/nginx/html;
+      proxy_pass http://192.168.33.10; #Unicornへ
     }
-    <% if node['nginx']['env'].include?("php") %>
-    location ~\.php$ {
-      fastcgi_pass   127.0.0.1:9000;
-      fastcgi_index  index.php;
-      fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
-      include        fastcgi_params;
-    }
-    <% end %>
-    <% if node['nginx']['env'].include?("ruby") %>
-    location /unicorn {
-      rewrite ^/unicorn/(.+) /$1 break;
-      proxy_pass http://unicorn/$1;
-    }
-    <% end %>
   }
 }

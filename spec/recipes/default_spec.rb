@@ -1,20 +1,19 @@
 require_relative '../spec_helper'
 
 describe 'ops::default' do
-  subject { ChefSpec::Runner.new.converge(described_recipe) }
-
-  # Write quick specs using `it` blocks with implied subjects
-  it { should do_something('...') }
-
-  # Write full examples using the `expect` syntax
-  it 'does something' do
-    expect(subject).to do_something('...')
+  let(:chef_run) { ChefSpec::Runner.new.converge(described_recipe) }
+=begin
+  let(:chef_run) do
+    ChefSpec::Runner.new do |node|
+      node.set["env"] = "ruby"
+    end.converge(described_recipe)
+  end
+=end
+  it 'Install Nginx' do
+    expect(:chef_run).to install_package('nginx')
   end
 
-  # Use an explicit subject
-  let(:chef_run) { ChefSpec::Runner.new.converge(described_recipe) }
-
-  it 'does something' do
-    expect(chef_run).to do_something('...')
+  it 'Create nginx.conf' do
+    expect(:chef_run).to create_template("/etc/nginx/nginx.conf")
   end
 end
