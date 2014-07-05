@@ -80,6 +80,27 @@ directory "#{node['app']['deploy_to']}/shared/config" do
   group 'deploy'
 end
 
+directory "#{node['app']['deploy_to']}/shared/log" do
+  owner 'deploy'
+  group 'deploy'
+end
+
+directory "#{node['app']['deploy_to']}/shared/tmp" do
+  owner 'deploy'
+  group 'deploy'
+end
+
+directory "#{node['app']['deploy_to']}/shared/tmp/pids" do
+  owner 'deploy'
+  group 'deploy'
+end
+
+directory "#{node['app']['deploy_to']}/shared/tmp/sockets" do
+  owner 'deploy'
+  group 'deploy'
+end
+
+
 template 'database.yml' do
   path "#{node['app']['deploy_to']}/shared/config/database.yml"
   source "database.yml.erb"
